@@ -96,7 +96,7 @@ export default function Cart() {
         data: cartItems.map((item) => ({
           product_id: item.product_id,
           amount: item.amount,
-          price: item.price,
+          price: item.price * item.amount,
         })),
       };
 

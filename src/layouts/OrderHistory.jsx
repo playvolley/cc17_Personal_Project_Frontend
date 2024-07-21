@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import useAuth from "../hooks/useAuth";
 import orderApi from "../apis/order";
-import axios from "axios";
 import productApi from "../apis/product";
 
 export default function OrderHistory() {
@@ -50,6 +49,14 @@ export default function OrderHistory() {
       <div className="text-red-500 text-center">Error: {error.message}</div>
     );
 
+  // คำนวณ Summary Price
+  const summaryPrice = orders.reduce((total, order) => {
+    const orderTotalPrice = order.orderItems.reduce((orderTotal, item) => {
+      return orderTotal + item.price;
+    }, 0);
+    return total + orderTotalPrice;
+  }, 0);
+
   return (
     <div className="container mx-auto p-4 shadow rounded bg-white">
       <h2 className="text-2xl font-bold mb-10 mt-10">History</h2>
@@ -63,7 +70,7 @@ export default function OrderHistory() {
         <ul>
           {orders.map((order) => {
             const totalPrice = order.orderItems.reduce((total, item) => {
-              return total + item.amount * item.price;
+              return total + item.price;
             }, 0);
 
             return (
@@ -99,6 +106,9 @@ export default function OrderHistory() {
           })}
         </ul>
       )}
+      <div className="mt-6">
+        <b>Summary Price: {summaryPrice} Baht</b>
+      </div>
     </div>
   );
 }
