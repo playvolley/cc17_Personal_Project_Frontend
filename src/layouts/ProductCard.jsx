@@ -1,32 +1,32 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable no-unused-vars */
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
 
 const ProductCard = ({ product, handleDelete, updateQuantity }) => {
   const [quantity, setQuantity] = useState(product.amount);
   const [totalPrice, setTotalPrice] = useState(product.price * product.amount);
 
+  useEffect(() => {
+    setTotalPrice(product.price * quantity);
+  }, [quantity, product.price]);
+
   const incrementQuantity = () => {
-    setQuantity((prevQuantity) => {
-      const newQuantity = prevQuantity + 1;
-      setTotalPrice(newQuantity * product.price);
-      updateQuantity(product.id, newQuantity);
-      return newQuantity;
-    });
+    const newQuantity = quantity + 1;
+    setQuantity(newQuantity);
+    updateQuantity(product.id, newQuantity);
   };
 
   const decrementQuantity = () => {
-    if (quantity > 0 && quantity !== 1) {
-      setQuantity((prevQuantity) => {
-        const newQuantity = prevQuantity - 1;
-        setTotalPrice(newQuantity * product.price);
-        updateQuantity(product.id, newQuantity);
-        return newQuantity;
-      });
+    if (quantity > 1) {
+      const newQuantity = quantity - 1;
+      setQuantity(newQuantity);
+      updateQuantity(product.id, newQuantity);
     }
+  };
+
+  const handleDeleteEvent = () => {
+    handleDelete(product.id);
   };
 
   return (
@@ -38,7 +38,7 @@ const ProductCard = ({ product, handleDelete, updateQuantity }) => {
       />
       <h3 className="text-lg font-medium mb-1">{product.name}</h3>
       <div className="flex items-center justify-between mt-4">
-        <span className="text-lg font-bold">{totalPrice} บาท</span>
+        <span className="text-lg font-bold">{totalPrice.toFixed(2)} บาท</span>
         <div className="flex items-center space-x-2">
           จำนวน &#160;
           <button
@@ -57,7 +57,7 @@ const ProductCard = ({ product, handleDelete, updateQuantity }) => {
         </div>
       </div>
       <button
-        onClick={() => handleDelete(product.id)}
+        onClick={handleDeleteEvent}
         className="absolute top-2 right-2 text-gray-500 hover:text-red-500"
       >
         <FontAwesomeIcon icon={faTrash} style={{ fontSize: "1.25rem" }} />
@@ -66,4 +66,17 @@ const ProductCard = ({ product, handleDelete, updateQuantity }) => {
   );
 };
 
+ProductCard.propTypes = {
+  product: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired,
+    amount: PropTypes.number.isRequired,
+    price: PropTypes.number.isRequired,
+    product: PropTypes.shape({
+      image: PropTypes.string.isRequired,
+    }).isRequired,
+  }).isRequired,
+  handleDelete: PropTypes.func.isRequired,
+  updateQuantity: PropTypes.func.isRequired,
+};
 export default ProductCard;

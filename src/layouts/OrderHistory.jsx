@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
 import useAuth from "../hooks/useAuth";
 import orderApi from "../apis/order";
+import axios from "axios";
+import productApi from "../apis/product";
 
 export default function OrderHistory() {
+  const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -10,10 +13,10 @@ export default function OrderHistory() {
 
   useEffect(() => {
     const fetchOrders = async () => {
+      const responseOrders = await orderApi.get(user.id);
       try {
-        const response = await orderApi.get(user.id);
-        setOrders(response.data);
-        console.log("response.data = ", response.data);
+        setOrders(responseOrders.data);
+        console.log("responseOrders.data = ", responseOrders.data);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -21,20 +24,39 @@ export default function OrderHistory() {
       }
     };
 
+    const fetchProducts = async () => {
+      try {
+        const responseProducts = await productApi.get();
+        setProducts(responseProducts.data);
+        setLoading(false);
+      } catch (error) {
+        setError(error);
+        setLoading(false);
+      }
+    };
+
     fetchOrders();
+    fetchProducts();
   }, [user.id]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
+      </div>
+    );
+  if (error)
+    return (
+      <div className="text-red-500 text-center">Error: {error.message}</div>
+    );
 
   return (
-    <div>
-      <h1>Orders for {user.firstName}</h1>
+    <div className="container mx-auto p-4 shadow rounded bg-white">
+      <h2 className="text-2xl font-bold mb-10 mt-10">History</h2>
+      <span>Order for </span>
+      <span className="font-semibold ">
+        {user.firstName} {user.lastName}
+      </span>
       {orders.length === 0 ? (
         <div>No orders found.</div>
       ) : (
@@ -45,19 +67,33 @@ export default function OrderHistory() {
             }, 0);
 
             return (
-              <li key={order.id}>
-                <h2>Order ID: {order.id}</h2>
-                <h2>Table ID: {order.table_id}</h2>
-                <h2>DATE_ORDER: {order.date_order}</h2>
+              <li key={order.id} className="mt-4 p-4 border rounded shadow">
+                <p>Order ID: {order.id}</p>
+                <p>Table: {order.table_id}</p>
+                <p>
+                  Date_Ordered:{" "}
+                  {new Date(order.date_order).toLocaleString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
                 <ul>
                   {order.orderItems.map((item) => (
                     <li key={item.id}>
-                      Product ID: {item.product_id}, Amount: {item.amount},
-                      Price: {item.price} Baht
+                      Product name:{" "}
+                      {
+                        products.find(
+                          (product) => product.id === item.product_id
+                        )?.name
+                      }
+                      , Amount: {item.amount}, Price: {item.price} Baht
                     </li>
                   ))}
                 </ul>
-                <h3>Total Price: {totalPrice} Baht</h3>
+                <b>Total Price: {totalPrice} Baht</b>
               </li>
             );
           })}

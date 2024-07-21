@@ -1,8 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import ProductCard from "./ProductCard";
 import cartApi from "../apis/cart";
-import orderApi from "../apis/order";
 import axios from "axios";
 import useAuth from "../hooks/useAuth";
 
@@ -30,22 +31,36 @@ export default function Cart() {
     fetchCart();
   }, []);
 
-  const handleDelete = async (cartId) => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:8888/cart/${cartId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+  const updateCart = useCallback((items) => {
+    const newTotalPrice = items.reduce(
+      (acc, item) => acc + item.price * item.amount,
+      0
+    );
+    const newTotalQuantity = items.reduce((acc, item) => acc + item.amount, 0);
 
-      const updatedItems = cartItems.filter((item) => item.id !== cartId);
-      setCartItems(updatedItems);
-      updateCart(updatedItems);
-    } catch (err) {
-      console.error("Error deleting item:", err.message);
-    }
-  };
+    setTotalPrice(newTotalPrice);
+    setTotalQuantity(newTotalQuantity);
+  }, []);
 
-  const deleteAllCartItems = async () => {
+  const handleDelete = useCallback(
+    async (cartId) => {
+      try {
+        const token = localStorage.getItem("token");
+        await axios.delete(`http://localhost:8888/cart/${cartId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const updatedItems = cartItems.filter((item) => item.id !== cartId);
+        setCartItems(updatedItems);
+        updateCart(updatedItems);
+      } catch (err) {
+        console.error("Error deleting item:", err.message);
+      }
+    },
+    [cartItems, updateCart]
+  );
+
+  const deleteAllCartItems = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
       await axios.delete(`http://localhost:8888/cart/delAll/${user.id}`, {
@@ -57,28 +72,20 @@ export default function Cart() {
     } catch (err) {
       console.error("Error deleting all cart items:", err.message);
     }
-  };
+  }, [user.id, updateCart]);
 
-  const updateQuantity = (id, newQuantity) => {
-    const updatedItems = cartItems.map((item) =>
-      item.id === id ? { ...item, amount: newQuantity } : item
-    );
-    setCartItems(updatedItems);
-    updateCart(updatedItems);
-  };
+  const updateQuantity = useCallback(
+    (id, newQuantity) => {
+      const updatedItems = cartItems.map((item) =>
+        item.id === id ? { ...item, amount: newQuantity } : item
+      );
+      setCartItems(updatedItems);
+      updateCart(updatedItems);
+    },
+    [cartItems, updateCart]
+  );
 
-  const updateCart = (items) => {
-    const newTotalPrice = items.reduce(
-      (acc, item) => acc + item.price * item.amount,
-      0
-    );
-    const newTotalQuantity = items.reduce((acc, item) => acc + item.amount, 0);
-
-    setTotalPrice(newTotalPrice);
-    setTotalQuantity(newTotalQuantity);
-  };
-
-  const handlePlaceOrder = async () => {
+  const handlePlaceOrder = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) return;
@@ -107,7 +114,7 @@ export default function Cart() {
     } catch (error) {
       console.error("Error placing the order:", error);
     }
-  };
+  }, [cartItems, deleteAllCartItems, navigate, user.id]);
 
   return (
     <div>
@@ -133,7 +140,9 @@ export default function Cart() {
       </div>
       {cartItems.length > 0 && (
         <div className="items-center flex flex-col gap-1 py-4">
-          <span className="text-xl">ราคาทั้งหมด: {totalPrice} บาท</span>
+          <span className="text-xl">
+            ราคาทั้งหมด: {totalPrice.toFixed(2)} บาท
+          </span>
           <span className="text-xl">จำนวนทั้งหมด: {totalQuantity} ชิ้น</span>
         </div>
       )}
