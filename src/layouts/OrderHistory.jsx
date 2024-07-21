@@ -49,7 +49,6 @@ export default function OrderHistory() {
                 <h2>Order ID: {order.id}</h2>
                 <h2>Table ID: {order.table_id}</h2>
                 <h2>DATE_ORDER: {order.date_order}</h2>
-                <h3>Total Price: {totalPrice} Baht</h3>
                 <ul>
                   {order.orderItems.map((item) => (
                     <li key={item.id}>
@@ -58,6 +57,7 @@ export default function OrderHistory() {
                     </li>
                   ))}
                 </ul>
+                <h3>Total Price: {totalPrice} Baht</h3>
               </li>
             );
           })}
