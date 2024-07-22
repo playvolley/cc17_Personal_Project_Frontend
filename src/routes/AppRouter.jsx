@@ -10,6 +10,10 @@ import Cart from "../layouts/Cart";
 import Order from "../layouts/ConfirmOrder";
 import OrderHistory from "../layouts/OrderHistory";
 import AdminPage from "../layouts/AdminPage";
+import AdminOrder from "../layouts/AdminOrder";
+import AdminProduct from "../layouts/AdminProduct";
+import AdminPayment from "../layouts/AdminPayment";
+import AdminGenerateQR from "../layouts/AdminGenerateQR";
 
 const guestRouter = createBrowserRouter([
   {
@@ -74,7 +78,13 @@ const AdminRouter = createBrowserRouter([
         <h1> Oops!! Invalid path</h1>
       </>
     ),
-    children: [{ index: true, element: <AdminPage /> }],
+    children: [
+      { index: true, element: <AdminPage /> },
+      { path: "/admin/order", element: <AdminOrder /> },
+      { path: "/admin/product", element: <AdminProduct /> },
+      { path: "/admin/payment", element: <AdminPayment /> },
+      { path: "/admin/generate", element: <AdminGenerateQR /> },
+    ],
   },
 ]);
 

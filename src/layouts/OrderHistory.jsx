@@ -107,7 +107,7 @@ export default function OrderHistory() {
         </ul>
       )}
       <div className="mt-6">
-        <b>Summary Price: {summaryPrice} Baht</b>
+        {orders.length > 0 && <b>Summary Price: {summaryPrice} Baht</b>}
       </div>
     </div>
   );

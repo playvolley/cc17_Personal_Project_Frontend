@@ -9,6 +9,8 @@ orderApi.get = (id) =>
     },
   });
 
+orderApi.getAllitems = () => axios.get("/orders/itemorder");
+
 orderApi.post = (body) => axios.post("/orders", body);
 
 export default orderApi;

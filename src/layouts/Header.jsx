@@ -4,7 +4,7 @@ import useAuth from "../hooks/useAuth";
 export default function Header() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-
+  console.log("object=>>>", user);
   const hdlLogout = () => {
     logout();
     navigate("/");
@@ -30,6 +30,16 @@ export default function Header() {
             </span>
           </Link>
         </div>
+
+        {user?.isAdmin === true && (
+          <div className="flex flex-row gap-8 text-white font-bold">
+            <Link to="/">Home</Link>
+            <Link to="/admin/order">Order</Link>
+            <Link to="/admin/product">Product</Link>
+            <Link to="/admin/payment">Payment</Link>
+            <Link to="/admin/generate">Generate</Link>
+          </div>
+        )}
 
         <div className="text-white mr-6">
           {user ? (
