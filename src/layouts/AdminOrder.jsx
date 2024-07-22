@@ -4,6 +4,7 @@ import orderApi from "../apis/order";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import productApi from "../apis/product";
+import paymentApi from "../apis/payment";
 
 dayjs.extend(utc);
 
@@ -76,6 +77,31 @@ const updateOrderStatus = async (itemId, newStatus) => {
   }
 };
 
+const createPayment = async (orderItems, totalPrice) => {
+  try {
+    const orderItemIds = orderItems.map((item) => item.id);
+
+    const response = await paymentApi.post({
+      orderItems: orderItemIds,
+      status: "NOTYET",
+      date_payment: new Date(),
+      total: totalPrice,
+      method: "Cash",
+    });
+
+    if (response.status !== 201) {
+      throw new Error("Network response was not ok");
+    }
+
+    alert(response.data.message);
+    return response.data;
+  } catch (error) {
+    alert(error.response.data.message);
+    console.error("Error creating payment:", error);
+    return null;
+  }
+};
+
 const OrderCard = ({ orders, products }) => {
   const [orderItems, setOrderItems] = useState(
     orders.reduce((acc, order) => {
@@ -85,6 +111,7 @@ const OrderCard = ({ orders, products }) => {
       return acc;
     }, {})
   );
+  const [totalPrice, setTotalPrice] = useState(0);
 
   const handleStatusChange = (itemId, newStatus) => {
     setOrderItems((prev) => ({
@@ -93,11 +120,43 @@ const OrderCard = ({ orders, products }) => {
     }));
     updateOrderStatus(itemId, newStatus);
   };
+
+  // ฟังก์ชันคำนวณ total price โดยเฉพาะรายการที่มี status: "SUCCESS"
+  useEffect(() => {
+    const calculateTotalPrice = (orders) => {
+      return orders.reduce((total, order) => {
+        const orderTotal = order.orderItems.reduce((orderSum, item) => {
+          if (orderItems[item.id] === "SUCCESS") {
+            return orderSum + item.price;
+          }
+          return orderSum;
+        }, 0);
+        return total + orderTotal;
+      }, 0);
+    };
+
+    setTotalPrice(calculateTotalPrice(orders));
+  }, [orderItems, orders]);
+
+  const handleCreatePayment = async () => {
+    const successfulItems = orders
+      .flatMap((order) => order.orderItems)
+      .filter((item) => orderItems[item.id] === "SUCCESS");
+
+    if (successfulItems.length > 0) {
+      await createPayment(successfulItems, totalPrice);
+      //alert("Payment created successfully!");
+    } else {
+      //alert("No successful items to create a payment.");
+    }
+  };
+
   return (
     <div className="bg-white shadow-md rounded-lg p-6 mb-4">
       <div className="text-2xl font-extrabold mb-5">
         {"Table: " + orders[0]?.table_id}
       </div>
+
       {orders.map((order) => (
         <div key={order?.date_order} className="mb-4">
           <h2 className="text-lg font-semibold mb-2">
@@ -112,6 +171,7 @@ const OrderCard = ({ orders, products }) => {
                     ?.name
                 }
                 ,<span className="font-medium"> Amount:</span> {item?.amount},
+                <span className="font-medium"> Price:</span> {item?.price},
                 <span className="font-medium"> Status:</span>
                 <select
                   value={orderItems[item?.id]}
@@ -127,6 +187,17 @@ const OrderCard = ({ orders, products }) => {
           </ul>
         </div>
       ))}
+      <div className="text-xl font-bold">
+        {"Total Price: " + totalPrice + " Baht"}
+      </div>
+      {totalPrice !== 0 && (
+        <button
+          onClick={handleCreatePayment}
+          className="mt-4 p-2 bg-blue-500 text-white rounded font-extrabold hover:bg-blue-800"
+        >
+          Create Payment
+        </button>
+      )}
     </div>
   );
 };
