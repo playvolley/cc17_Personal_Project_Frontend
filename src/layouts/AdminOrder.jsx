@@ -4,7 +4,6 @@ import orderApi from "../apis/order";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import productApi from "../apis/product";
-import axios from "../config/axios";
 
 dayjs.extend(utc);
 
@@ -97,25 +96,25 @@ const OrderCard = ({ orders, products }) => {
   return (
     <div className="bg-white shadow-md rounded-lg p-6 mb-4">
       <div className="text-2xl font-extrabold mb-5">
-        {"Table: " + orders[0].table_id}
+        {"Table: " + orders[0]?.table_id}
       </div>
       {orders.map((order) => (
-        <div key={order.date_order} className="mb-4">
+        <div key={order?.date_order} className="mb-4">
           <h2 className="text-lg font-semibold mb-2">
-            {dayjs(order.date_order).utc().format("MMMM DD • HH:m a • YYYY")}
+            {dayjs(order?.date_order).utc().format("MMMM DD • HH:m a • YYYY")}
           </h2>
           <ul>
-            {order.orderItems.map((item) => (
-              <li key={item.id} className="mb-1">
+            {order.orderItems?.map((item) => (
+              <li key={item?.id} className="mb-1">
                 <span className="font-medium">Product name:</span>{" "}
                 {
                   products?.find((product) => product.id === item.product_id)
                     ?.name
                 }
-                ,<span className="font-medium"> Amount:</span> {item.amount},
+                ,<span className="font-medium"> Amount:</span> {item?.amount},
                 <span className="font-medium"> Status:</span>
                 <select
-                  value={orderItems[item.id]}
+                  value={orderItems[item?.id]}
                   onChange={(e) => handleStatusChange(item.id, e.target.value)}
                   className="ml-2 p-1 border rounded"
                 >
@@ -144,7 +143,7 @@ const TodoList = ({ dataAPI, products }) => {
 
   return (
     <div className="container mx-auto p-4">
-      {Object.values(groupedOrders).map((orders, index) => (
+      {Object.values(groupedOrders)?.map((orders, index) => (
         <OrderCard key={index} orders={orders} products={products} />
       ))}
     </div>
