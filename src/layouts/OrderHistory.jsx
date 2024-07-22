@@ -41,7 +41,9 @@ export default function OrderHistory() {
   if (loading)
     return (
       <div className="flex justify-center items-center h-screen">
-        <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
+        <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4">
+          Loading...
+        </div>
       </div>
     );
   if (error)
@@ -92,7 +94,7 @@ export default function OrderHistory() {
                     <li key={item.id}>
                       Product name:{" "}
                       {
-                        products.find(
+                        products?.find(
                           (product) => product.id === item.product_id
                         )?.name
                       }
