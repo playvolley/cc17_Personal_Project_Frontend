@@ -41,7 +41,7 @@ export default function AdminOrder() {
 
     fetchOrders();
     fetchProducts();
-  }, []);
+  }, [orders]);
 
   if (loading)
     return (

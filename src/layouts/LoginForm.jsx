@@ -26,12 +26,19 @@ export default function LoginForm() {
         return toast.error("Please fill form");
       }
       // ส่ง input ไป backend
-      const rs = await axios.post("http://localhost:8888/auth/login", input);
+      const rs = await axios.post(
+        `${axios.defaults.baseURL}/auth/login`,
+        input
+      );
       // console.log("input = ", input);
       localStorage.setItem("token", rs.data.accessToken);
       // console.log("rs = ", rs);
       // console.log("Token = ", rs.data.accessToken);
-      const rs2 = await axios.get("http://localhost:8888/auth/me", {
+      // const rs2 = await axios.get("http://localhost:8888/auth/me", {
+      //   headers: { Authorization: `Bearer ${rs.data.accessToken}` },
+      // });
+
+      const rs2 = await axios.get(`${axios.defaults.baseURL}/auth/me`, {
         headers: { Authorization: `Bearer ${rs.data.accessToken}` },
       });
       // console.log(rs2)

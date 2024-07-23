@@ -20,9 +20,14 @@ function AuthContextProvider(props) {
         if (!token) {
           return;
         }
-        const rs = await axios.get("http://localhost:8888/auth/me", {
+        // const rs = await axios.get("http://localhost:8888/auth/me", {
+        //   headers: { Authorization: `Bearer ${token}` },
+        // });
+
+        const rs = await axios.get(`${axios.defaults.baseURL}/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+
         setUser(rs.data.user);
       } catch (err) {
         console.log(err);

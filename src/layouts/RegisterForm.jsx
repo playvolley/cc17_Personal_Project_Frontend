@@ -22,12 +22,29 @@ export default function RegisterForm() {
     try {
       e.preventDefault();
       // validation
+
+      if (
+        !input.password ||
+        !input.confirmPassword ||
+        !input.firstName ||
+        !input.lastName ||
+        !input.username
+      ) {
+        return toast.error("please fill form, Register must have no empty.");
+      }
+
       if (input.password !== input.confirmPassword) {
         return toast.error("please check confirm password again");
         //alert("please check confirm password again");
       }
       // จัด input ส่ง api
-      const rs = await axios.post("http://localhost:8888/auth/register", input);
+
+      //toast.success("ส่ง api แล้ว");
+      const rs = await axios.post(
+        `${axios.defaults.baseURL}/auth/register`,
+        input
+      );
+      toast.success("OK");
 
       if (rs.status === 201) {
         //alert("Register Successful");

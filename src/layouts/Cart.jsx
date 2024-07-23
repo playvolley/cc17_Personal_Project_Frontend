@@ -46,7 +46,11 @@ export default function Cart() {
     async (cartId) => {
       try {
         const token = localStorage.getItem("token");
-        await axios.delete(`http://localhost:8888/cart/${cartId}`, {
+        // await axios.delete(`http://localhost:8888/cart/${cartId}`, {
+        //   headers: { Authorization: `Bearer ${token}` },
+        // });
+
+        await axios.delete(`${axios.defaults.baseURL}/cart/${cartId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -63,7 +67,11 @@ export default function Cart() {
   const deleteAllCartItems = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:8888/cart/delAll/${user.id}`, {
+      // await axios.delete(`http://localhost:8888/cart/delAll/${user.id}`, {
+      //   headers: { Authorization: `Bearer ${token}` },
+      // });
+
+      await axios.delete(`${axios.defaults.baseURL}/cart/delAll/${user.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -100,8 +108,16 @@ export default function Cart() {
         })),
       };
 
+      // const response = await axios.post(
+      //   "http://localhost:8888/orders",
+      //   orderData,
+      //   {
+      //     headers: { Authorization: `Bearer ${token}` },
+      //   }
+      // );
+
       const response = await axios.post(
-        "http://localhost:8888/orders",
+        `${axios.defaults.baseURL}/orders`,
         orderData,
         {
           headers: { Authorization: `Bearer ${token}` },

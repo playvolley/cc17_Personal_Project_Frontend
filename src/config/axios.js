@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getAccessToken, removeAccessToken } from "../utils/local-storage";
 
-axios.defaults.baseURL = import.meta.env.VITE_API_URL;
+axios.defaults.baseURL = `http://${window.location.hostname}:8888`;
 console.log("defaults.baseURL = ", axios.defaults.baseURL);
 axios.interceptors.request.use(
   (config) => {
