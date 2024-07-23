@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import useAuth from "../hooks/useAuth";
+import { Toaster, toast } from "react-hot-toast";
 
 export default function LoginForm() {
   const { user, setUser } = useAuth();
@@ -22,7 +23,7 @@ export default function LoginForm() {
       e.preventDefault();
       // validation
       if (!input.username.trim() || !input.password.trim()) {
-        return alert("Please fill form");
+        return toast.error("Please fill form");
       }
       // ส่ง input ไป backend
       const rs = await axios.post("http://localhost:8888/auth/login", input);
@@ -43,51 +44,55 @@ export default function LoginForm() {
   };
 
   return (
-    <div>
-      <h1 className="text-4xl my-10 text-center">Login Form</h1>
-      <form
-        className="border w-3/4 mx-auto p-4 rounded-lg"
-        onSubmit={hdlSubmit}
-      >
-        <label className="form-control w-full">
-          <div className="label">
-            <span className="label-text">Username :</span>
-          </div>
-          <input
-            type="text"
-            className="input input-bordered w-full"
-            name="username"
-            value={input.username}
-            onChange={hdlChange}
-          />
-        </label>
-        <br />
-        <label className="form-control w-full">
-          <div className="label">
-            <span className="label-text">Password :</span>
-          </div>
-          <input
-            type="password"
-            className="input input-bordered w-full"
-            name="password"
-            value={input.password}
-            onChange={hdlChange}
-          />
-        </label>
+    <>
+      <Toaster position="bottom-right" reverseOrder={false} />
 
-        <button
-          type="submit"
-          className="btn btn-outline btn-primary mt-6 w-full"
+      <div>
+        <h1 className="text-4xl my-10 text-center">Login Form</h1>
+        <form
+          className="border w-3/4 mx-auto p-4 rounded-lg"
+          onSubmit={hdlSubmit}
         >
-          Login
-        </button>
-        <br />
-        <br />
-        <hr className="my-2 border border-gray-300" />
-        <button className="btn btn-outline btn-primary mt-6 w-full">
-          <Link to="/register">Register</Link>
-        </button>
-      </form>
-    </div>
+          <label className="form-control w-full">
+            <div className="label">
+              <span className="label-text">Username :</span>
+            </div>
+            <input
+              type="text"
+              className="input input-bordered w-full"
+              name="username"
+              value={input.username}
+              onChange={hdlChange}
+            />
+          </label>
+          <br />
+          <label className="form-control w-full">
+            <div className="label">
+              <span className="label-text">Password :</span>
+            </div>
+            <input
+              type="password"
+              className="input input-bordered w-full"
+              name="password"
+              value={input.password}
+              onChange={hdlChange}
+            />
+          </label>
+
+          <button
+            type="submit"
+            className="btn btn-outline btn-primary mt-6 w-full"
+          >
+            Login
+          </button>
+          <br />
+          <br />
+          <hr className="my-2 border border-gray-300" />
+          <button className="btn btn-outline btn-primary mt-6 w-full">
+            <Link to="/register">Register</Link>
+          </button>
+        </form>
+      </div>
+    </>
   );
 }

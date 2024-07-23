@@ -3,6 +3,7 @@ import productApi from "../apis/product";
 import cartApi from "../apis/cart";
 import useAuth from "../hooks/useAuth";
 import { Link } from "react-router-dom";
+import { Toaster, toast } from "react-hot-toast";
 
 export default function Menu() {
   const [products, setProducts] = useState([]);
@@ -36,7 +37,8 @@ export default function Menu() {
     const response = await cartApi.post(data);
     console.log("response = ", response);
     console.log(`Add product ${product.id} to cart`);
-    alert(`Added ${product.name}`);
+    //alert(`Added ${product.name}`);
+    toast.success(`Added ${product.name}`);
   };
 
   if (loading) {
@@ -49,6 +51,8 @@ export default function Menu() {
 
   return (
     <>
+      <Toaster position="bottom-right" reverseOrder={false} />
+
       <div className="p-6 grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {products.map((product) => (
           <div
